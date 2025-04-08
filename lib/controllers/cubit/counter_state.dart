@@ -1,3 +1,4 @@
+part of 'counter_cubit.dart';
 sealed class CounterState {
   final int count;
   const CounterState(this.count);

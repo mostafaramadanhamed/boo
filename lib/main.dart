@@ -1,8 +1,8 @@
-import 'package:boo/controllers/cubit/counter_cubit.dart';
+import 'package:boo/controllers/bloc/counter_bloc.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'controllers/cubit/counter_state.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,7 +34,7 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     print('MyHomePage build method called');
     return BlocProvider(
-      create: (context) => CounterCubit(),
+      create: (context) => CounterBloc(),
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Flutter Demo Home Page'),
@@ -43,7 +43,7 @@ class MyHomePage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              BlocBuilder<CounterCubit, CounterState>(
+              BlocBuilder<CounterBloc, CounterState>(
                 builder: (context, state) {
                   print('BlocBuilder rebuilds with state: $state');
                   return Text(
@@ -56,7 +56,7 @@ class MyHomePage extends StatelessWidget {
             ],
           ),
         ),
-        floatingActionButton: BlocBuilder<CounterCubit, CounterState>(
+        floatingActionButton: BlocBuilder<CounterBloc, CounterState>(
           builder: (context, state) {
             return Column(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -64,7 +64,7 @@ class MyHomePage extends StatelessWidget {
                 FloatingActionButton(
                   onPressed: () {
                     // Here you can add the logic to increment the counter
-                    context.read<CounterCubit>().increment();
+                    context.read<CounterBloc>().add(IncrementEvent());
                   },
                   tooltip: 'Increment',
                   child: const Icon(Icons.add),
@@ -73,20 +73,13 @@ class MyHomePage extends StatelessWidget {
                 FloatingActionButton(
                   onPressed: () {
                     // Here you can add the logic to decrement the counter
-                    context.read<CounterCubit>().decrement();
+                    context.read<CounterBloc>().add(DecrementEvent());
                   },
                   tooltip: 'Decrement',
                   child: const Icon(Icons.remove),
                 ),
                 const SizedBox(height: 10), // Add some space between buttons
-                FloatingActionButton(
-                  onPressed: () {
-                    // Here you can add the logic to reset the counter
-                    context.read<CounterCubit>().reset();
-                  },
-                  tooltip: 'Reset',
-                  child: const Icon(Icons.refresh),
-                ),
+            
               ],
             );
           },
