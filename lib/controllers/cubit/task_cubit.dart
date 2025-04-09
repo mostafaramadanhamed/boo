@@ -8,7 +8,8 @@ part 'task_state.dart';
 class TaskCubit extends Cubit<TaskState> {
   TaskCubit() : super(TaskInitial());
 
-  void addTask(TaskModel task) {
+  void addTask(String title) {
+    final task = TaskModel(id: DateTime.now().millisecondsSinceEpoch, title: title, isCompleted: false);
     emit(UpdateTask([...state.tasks, task]));
   }
   void removeTask(int id) {
