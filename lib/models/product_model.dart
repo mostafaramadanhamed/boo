@@ -20,7 +20,7 @@ class ProductModel extends Equatable {
     required this.rating,
   });
 
-  factory ProductModel.feromJson(Map<String, dynamic> json) {
+  factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
       id: json['id'],
       title: json['title'],
