@@ -7,7 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'controllers/cubit/task_bloc.dart';
 import 'controllers/cubit/task_event.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   HydratedBloc.storage = await HydratedStorage.build(
     storageDirectory: HydratedStorageDirectory((await getTemporaryDirectory()).path),
