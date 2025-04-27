@@ -2,14 +2,14 @@ import 'dart:async';
 
 import 'package:boo/controllers/cubit/task_event.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 import '../../models/task_model.dart';
 
 
 part 'task_state.dart';
 
-class TaskBloc extends Bloc<TaskEvent, TaskState> {
+class TaskBloc extends HydratedBloc<TaskEvent, TaskState> {
   TaskBloc() : super(TaskInitial()) {
     on<AddTaskEvent>(_addTask);
 
@@ -34,6 +34,20 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     }).toList();
 
     emit(UpdateTask(newList));
+  }
+  
+  @override
+  TaskState? fromJson(Map<String, dynamic> json) {
+   return UpdateTask(
+      (json['tasks'] as List).map((task) => TaskModel.fromJson(task)).toList(),
+    );
+  }
+  
+  @override
+  Map<String, dynamic>? toJson(TaskState state) {
+    return {
+      'tasks':state.tasksList.map((task) => task.toJson()).toList(),
+    };
   }
   
 
