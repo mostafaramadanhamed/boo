@@ -1,14 +1,17 @@
-import 'package:boo/controllers/cubit/counter_cubit.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'controllers/cubit/task_bloc.dart';
+import 'controllers/cubit/task_event.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   HydratedBloc.storage = await HydratedStorage.build(
-    storageDirectory:
-        HydratedStorageDirectory((await getTemporaryDirectory()).path),
+    storageDirectory: HydratedStorageDirectory((await getTemporaryDirectory()).path),
+
   );
   runApp(const MyApp());
 }
@@ -37,40 +40,58 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => CounterCubit(),
-      child: Scaffold(
-        floatingActionButton: BlocBuilder<CounterCubit, CounterState>(
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(title),
+      ),
+      body: BlocProvider(
+        create: (context) => TaskBloc(),
+        child: BlocBuilder<TaskBloc, TaskState>(
           builder: (context, state) {
+            final controllerCubit = context.read<TaskBloc>();
             return Column(
-              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                FloatingActionButton(
-                  onPressed: () {
-                    context.read<CounterCubit>().increment(context);
-                  },
-                  tooltip: 'Increment',
-                  child: const Icon(Icons.add),
+                TextField(
+                  controller: controller,
+                  decoration: const InputDecoration(hintText: 'Enter a task'),
                 ),
-                FloatingActionButton(
+                ElevatedButton(
                   onPressed: () {
-                    context.read<CounterCubit>().decrement();
+                    if (controller.text.isEmpty) return;
+                    controllerCubit.add(AddTaskEvent(controller.text));
+                    controller.clear();
                   },
-                  tooltip: 'Decrement',
-                  child: const Icon(Icons.remove),
+                  child: const Text("Add Task"),
                 ),
-              ],
-            );
-          },
+                Expanded(
+                    child: ListView.builder(
+                  itemCount: state.tasksList.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return ListTile(
+                      title: Text(
+                        state.tasksList[index].title,
+                      ),
+                      leading: Checkbox(
+                        value: state.tasksList[index].isCompleted,
+                        onChanged: (value) {
+                          controllerCubit.add(ToggleTaskEvent(state.tasksList[index].id));
+                        },
+                      ),
+                      trailing: IconButton(
+                        onPressed: () {
+                          controllerCubit.add(RemoveTaskEvent(state.tasksList[index].id));
+                        },
+                        icon: const Icon(Icons.delete),
+                      ),
+                    );
+                  },
+                )),
+      
+            ],
+          );
+        },
         ),
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: Text(title),
-        ),
-        body: Center(
-            child: BlocBuilder<CounterCubit, CounterState>(
-          builder: (context, state) => Text('${state.count}'),
-        )),
       ),
     );
   }
