@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'bloc_observer.dart';
 import 'controllers/cubit/login_cubit.dart';
 
 void main() {
+  Bloc.observer = AppBlocObserver(); // Set the Bloc observer to log events and state changes
   runApp(const MyApp());
 }
 
