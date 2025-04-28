@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
@@ -10,8 +9,8 @@ import 'controllers/cubit/task_event.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   HydratedBloc.storage = await HydratedStorage.build(
-    storageDirectory: HydratedStorageDirectory((await getTemporaryDirectory()).path),
-
+    storageDirectory:
+        HydratedStorageDirectory((await getTemporaryDirectory()).path),
   );
   runApp(const MyApp());
 }
@@ -47,50 +46,65 @@ class MyHomePage extends StatelessWidget {
       ),
       body: BlocProvider(
         create: (context) => TaskBloc(),
-        child: BlocBuilder<TaskBloc, TaskState>(
-          builder: (context, state) {
-            final controllerCubit = context.read<TaskBloc>();
-            return Column(
-              children: [
-                TextField(
-                  controller: controller,
-                  decoration: const InputDecoration(hintText: 'Enter a task'),
+        child: BlocListener<TaskBloc,TaskState>(
+          listener: (context, state) {
+           if (state is UpdateTask) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Task added successfully'),
+                  duration: Duration(seconds: 2),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (controller.text.isEmpty) return;
-                    controllerCubit.add(AddTaskEvent(controller.text));
-                    controller.clear();
-                  },
-                  child: const Text("Add Task"),
-                ),
-                Expanded(
-                    child: ListView.builder(
-                  itemCount: state.tasksList.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return ListTile(
-                      title: Text(
-                        state.tasksList[index].title,
-                      ),
-                      leading: Checkbox(
-                        value: state.tasksList[index].isCompleted,
-                        onChanged: (value) {
-                          controllerCubit.add(ToggleTaskEvent(state.tasksList[index].id));
-                        },
-                      ),
-                      trailing: IconButton(
-                        onPressed: () {
-                          controllerCubit.add(RemoveTaskEvent(state.tasksList[index].id));
-                        },
-                        icon: const Icon(Icons.delete),
-                      ),
-                    );
-                  },
-                )),
-      
-            ],
-          );
-        },
+              );
+           
+            }
+
+          },
+          child: BlocBuilder<TaskBloc, TaskState>(
+            builder: (context, state) {
+              final controllerCubit = context.read<TaskBloc>();
+              return Column(
+                children: [
+                  TextField(
+                    controller: controller,
+                    decoration: const InputDecoration(hintText: 'Enter a task'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (controller.text.isEmpty) return;
+                      controllerCubit.add(AddTaskEvent(controller.text));
+                      controller.clear();
+                    },
+                    child: const Text("Add Task"),
+                  ),
+                  Expanded(
+                      child: ListView.builder(
+                    itemCount: state.tasksList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return ListTile(
+                        title: Text(
+                          state.tasksList[index].title,
+                        ),
+                        leading: Checkbox(
+                          value: state.tasksList[index].isCompleted,
+                          onChanged: (value) {
+                            controllerCubit.add(
+                                ToggleTaskEvent(state.tasksList[index].id));
+                          },
+                        ),
+                        trailing: IconButton(
+                          onPressed: () {
+                            controllerCubit.add(
+                                RemoveTaskEvent(state.tasksList[index].id));
+                          },
+                          icon: const Icon(Icons.delete),
+                        ),
+                      );
+                    },
+                  )),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
